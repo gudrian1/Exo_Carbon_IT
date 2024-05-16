@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +18,8 @@ public class Carte {
     private int largeur;
     private int hauteur;
     private String[][] carte;
-    private Map<Point, Integer> tresors;
-    private ArrayList<Aventurier> aventuriers;
+    private Map<Point, Integer> tresors = new HashMap<>();
+    private List<Aventurier> aventuriers = new ArrayList<>();
 
     /**
      * Constructeur de la carte
@@ -28,13 +29,18 @@ public class Carte {
     public Carte(int largeur, int hauteur) {
         this.largeur = largeur;
         this.hauteur = hauteur;
-        carte = new String[hauteur][largeur];
-        for (int y = 0; y < hauteur; y++) {
-            for (int x = 0; x < largeur; x++) {
-                carte[y][x] = ".";
+        initCarte();
+    }
+
+    /**
+     * Initialise la carte avec des points vides
+     */
+    private void initCarte() {
+        this.carte = new String[this.hauteur][this.largeur];
+        for (int y = 0; y < this.hauteur; y++) {
+            for (int x = 0; x < this.largeur; x++) {
+                this.carte[y][x] = ".";
             }
         }
-        tresors = new HashMap<>();
-        aventuriers = new ArrayList<>();
     }
 }
