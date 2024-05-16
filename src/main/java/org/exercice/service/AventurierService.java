@@ -40,31 +40,18 @@ public class AventurierService {
     public void avancer(Aventurier aventurier, Carte carte) {
         int newX = aventurier.getX() + aventurier.getOrientation().dx;
         int newY = aventurier.getY() + aventurier.getOrientation().dy;
-        if (newX >= 0 && newX < carte.largeur && newY >= 0 && newY < carte.hauteur && !carte.carte[newY][newX].equals("M")) {
-            Point key = new Point(newX, newY);
-            if (carte.tresors.containsKey(key) && carte.tresors.get(key) > 0) {
-                int nbTresors = carte.tresors.get(key) - 1;
-                carte.tresors.put(key, nbTresors);
-                if (nbTresors == 0) {
-                    carte.tresors.remove(key);
-                }
-            }
-            // Vérifie si un autre aventurier se trouve à la position précédente
-            boolean autreAventurier = false;
-            for (Aventurier autre : carte.getAventuriers()) {
-                if (autre != aventurier && autre.getX() == aventurier.getX() && autre.getY() == aventurier.getY()) {
-                    autreAventurier = true;
-                    break;
-                }
-            }
-            // Si aucun autre aventurier ne se trouve à la position précédente, la remplacer par "."
-            if (!autreAventurier) {
-                carte.carte[aventurier.getY()][aventurier.getX()] = ".";
-            }
-            // Met à jour la position de l'aventurier sur la carte
-            carte.carte[newY][newX] = "A";
-            aventurier.setX(newX);
-            aventurier.setY(newY);
+
+        if (estSurLaCarte(newX, newY, carte) && !estMur(newX, newY, carte)) {
+            Point nouvellePosition = new Point(newX, newY);
+
+            // Gère les trésors
+            gererTresor(nouvellePosition, carte);
+
+            // Remplace la position précédente de l'aventurier par "." si aucun autre aventurier ne s'y trouve
+            remplacerAnciennePlace(aventurier, carte);
+
+            // Met à jour la position de l'aventurier
+            mettreAJourPlace(aventurier, newX, newY, carte);
         }
     }
 
@@ -81,5 +68,39 @@ public class AventurierService {
                 tourner(aventurier, action);
             }
         }
+    }
+
+
+    private boolean estSurLaCarte(int x, int y, Carte carte) {
+        return x >= 0 && x < carte.getLargeur() && y >= 0 && y < carte.getHauteur();
+    }
+
+    private boolean estMur(int x, int y, Carte carte) {
+        return carte.getCarte()[y][x].equals("M");
+    }
+
+    private void gererTresor(Point position, Carte carte) {
+        if (carte.getTresors().containsKey(position) && carte.getTresors().get(position) > 0) {
+            int nbTresors = carte.getTresors().get(position) - 1;
+            carte.getTresors().put(position, nbTresors);
+            if (nbTresors == 0) {
+                carte.getTresors().remove(position);
+            }
+        }
+    }
+
+    private void remplacerAnciennePlace(Aventurier aventurier, Carte carte) {
+        boolean autreAventurier = carte.getAventuriers().stream()
+                .anyMatch(autre -> autre != aventurier && autre.getX() == aventurier.getX() && autre.getY() == aventurier.getY());
+
+        if (!autreAventurier) {
+            carte.getCarte()[aventurier.getY()][aventurier.getX()] = ".";
+        }
+    }
+
+    private void mettreAJourPlace(Aventurier aventurier, int newX, int newY, Carte carte) {
+        carte.getCarte()[newY][newX] = "A";
+        aventurier.setX(newX);
+        aventurier.setY(newY);
     }
 }

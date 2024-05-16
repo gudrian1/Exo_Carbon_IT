@@ -7,7 +7,8 @@ import java.util.Objects;
  */
 public class Point {
 
-    int x, y;
+    int x;
+    int y;
 
     /**
      * Constructeur du point

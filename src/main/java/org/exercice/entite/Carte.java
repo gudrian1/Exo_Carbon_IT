@@ -14,11 +14,11 @@ import java.util.Map;
 @Setter
 public class Carte {
 
-    public int largeur;
-    public int hauteur;
-    public String[][] carte;
-    public Map<Point, Integer> tresors;
-    public ArrayList<Aventurier> aventuriers;
+    private int largeur;
+    private int hauteur;
+    private String[][] carte;
+    private Map<Point, Integer> tresors;
+    private ArrayList<Aventurier> aventuriers;
 
     /**
      * Constructeur de la carte

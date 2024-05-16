@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
  * Classe de tests pour la classe Aventurier
  */
 @ExtendWith(MockitoExtension.class)
-public class AventurierServiceTests {
+class AventurierServiceTests {
 
     private Aventurier aventurier;
     private Carte carte;
@@ -39,7 +39,7 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenAvancer_shouldMoveInMap() {
+    void whenAvancer_shouldMoveInMap() {
         AventurierService aventurierService = new AventurierService(orientationService);
 
         aventurierService.avancer(aventurier, carte);
@@ -49,7 +49,7 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenAvancerOnTreasure_shouldPickUpTreasure() {
+    void whenAvancerOnTreasure_shouldPickUpTreasure() {
         aventurier = new Aventurier("Test", 1, 1, Orientation.E, "A");
         carteService.ajouterTresor(carte,2, 1, 1);
         aventurierService.avancer(aventurier, carte);
@@ -59,7 +59,7 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenAvancerOnMountain_shouldNotMove() {
+    void whenAvancerOnMountain_shouldNotMove() {
         aventurier = new Aventurier("Test", 1, 1, Orientation.E, "A");
         carteService.ajouterMontagne(carte,2, 1);
         aventurierService.avancer(aventurier, carte);
@@ -68,7 +68,7 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenAvancerOutOfMap_shouldNotMove() {
+    void whenAvancerOutOfMap_shouldNotMove() {
         aventurier = new Aventurier("Test", 0, 0, Orientation.N, "A");
         aventurierService.avancer(aventurier, carte);
         assertEquals(0, aventurier.getX()); // L'aventurier ne doit pas bouger
@@ -76,7 +76,7 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenTourner_shouldTourner() {
+    void whenTourner_shouldTourner() {
         when(orientationService.droite(Orientation.N)).thenReturn(Orientation.E);
 
         aventurierService.tourner(aventurier, 'D');
@@ -85,11 +85,11 @@ public class AventurierServiceTests {
     }
 
     @Test
-    public void whenExecuterSequence_shouldExecute() {
+    void whenExecuterSequence_shouldExecute() {
         aventurierService.executerSequence(aventurier, carte);
         Map<Point, Integer> tresor = carte.getTresors();
         assertEquals(2, aventurier.getX());
         assertEquals(0, aventurier.getY());
-        assertTrue(carte.tresors.containsKey(new Point(2, 2)));
+        assertTrue(carte.getTresors().containsKey(new Point(2, 2)));
     }
 }

@@ -10,11 +10,11 @@ import lombok.Setter;
 @Setter
 public class Aventurier {
 
-    public String nom;
-    public int x;
-    public int y;
-    public Orientation orientation;
-    public String sequence;
+    private String nom;
+    private int x;
+    private int y;
+    private Orientation orientation;
+    private String sequence;
 
     /**
      * Constructeur de l'aventurier
