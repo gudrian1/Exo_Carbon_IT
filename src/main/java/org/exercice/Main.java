@@ -21,7 +21,7 @@ public class Main {
         var orientationService = new OrientationService();
         var aventurierService = new AventurierService(orientationService);
         // Définition du nom du fichier à lire
-        String nomFichier = "entree.txt";
+        String nomFichier = "src/main/resources/entree.txt";
         // Appel de la méthode pour lire le fichier d'entrée et construire la carte
         Scanner scanner;
         try {
