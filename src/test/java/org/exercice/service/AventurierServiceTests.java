@@ -71,7 +71,7 @@ class AventurierServiceTests {
     }
 
     @Test
-    void whenAvancerSurMur_shouldNotAvance() {
+    void whenAvancerSurMontagne_shouldNotAvance() {
         Aventurier aventurier = new Aventurier("Lara", 1, 1, Orientation.N, "");
         Carte carte = new Carte(3, 3);
         String[][] carteArray = {
