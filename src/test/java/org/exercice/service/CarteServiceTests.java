@@ -6,37 +6,29 @@ import org.exercice.entite.Orientation;
 import org.exercice.entite.Point;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Classe de tests pour la classe Carte
  */
-@ExtendWith(MockitoExtension.class)
-public class CarteServiceTests {
+class CarteServiceTests {
 
-    @Mock
     private CarteService carteService;
-
-    private Carte carte;
-    private Aventurier aventurier;
 
     @BeforeEach
     public void setUp() {
-        carte = new Carte(5, 5);
-        aventurier = new Aventurier("Indiana Jones", 2, 2, Orientation.N, "AADADAGGA");
+        carteService = new CarteService();
     }
 
     @Test
-    public void whenAjouterAventurier_shouldAdd() {
-        CarteService carteService = new CarteService();
-
+    void whenAjouterAventurier_shouldAdd() {
+        Carte carte = new Carte(5, 5);
+        Aventurier aventurier = new Aventurier("Indiana Jones", 2, 2, Orientation.N, "AADADAGGA");
         carteService.ajouterAventurier(carte, aventurier);
 
         assertEquals(aventurier, carteService.getAventurier(carte, "Indiana Jones"));
@@ -45,18 +37,35 @@ public class CarteServiceTests {
 
     @Test
     void whenAjouterMontagne_shouldAdd() {
-        CarteService carteService = new CarteService();
+        Carte carte = new Carte(5, 5);
         carteService.ajouterMontagne(carte, 1, 1);
         assertEquals("M", carte.getCarte()[1][1]);
     }
 
     @Test
     void whenAjouterTresor_shouldAdd() {
-        CarteService carteService = new CarteService();
+        Carte carte = new Carte(5, 5);
         carteService.ajouterTresor(carte, 2, 2, 3);
         Map<Point, Integer> tresor = carte.getTresors();
         assertEquals("T(3)", carte.getCarte()[2][2]);
-        assertEquals(3, tresor.get(new Point(2,2)));
+        assertEquals(3, tresor.get(new Point(2, 2)));
     }
 
+    @Test
+    void whenAfficherCarte_shouldAffiche() {
+        Carte carte = new Carte(3, 3);
+        carteService.ajouterMontagne(carte, 1, 1);
+        carteService.ajouterTresor(carte, 2, 2, 3);
+        carteService.ajouterAventurier(carte, new Aventurier("Lara", 0, 0, Orientation.N, "AADG"));
+
+        // Créer un flux de sortie pour capturer la sortie de la console
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        carteService.afficherCarte(carte);
+
+        String expectedOutput = "A . .\n. M .\n. . T(3)\n\n";
+        // Vérifier que la sortie n'est pas vide
+        assertFalse(outContent.toString().isEmpty());
+    }
 }

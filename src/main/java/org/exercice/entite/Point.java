@@ -12,6 +12,7 @@ public class Point {
 
     /**
      * Constructeur du point
+     *
      * @param x La position x du point
      * @param y La position y du point
      */

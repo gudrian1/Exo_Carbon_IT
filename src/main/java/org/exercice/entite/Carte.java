@@ -23,6 +23,7 @@ public class Carte {
 
     /**
      * Constructeur de la carte
+     *
      * @param largeur La largeur de la carte
      * @param hauteur La hauteur de la carte
      */

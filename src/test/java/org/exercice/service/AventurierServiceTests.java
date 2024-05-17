@@ -4,16 +4,17 @@ import org.exercice.entite.Aventurier;
 import org.exercice.entite.Carte;
 import org.exercice.entite.Orientation;
 import org.exercice.entite.Point;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 /**
  * Classe de tests pour la classe Aventurier
@@ -21,75 +22,111 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AventurierServiceTests {
 
-    private Aventurier aventurier;
-    private Carte carte;
-
-    @Mock
-    private CarteService carteService;
-    @Mock
-    private AventurierService aventurierService;
     @Mock
     private OrientationService orientationService;
 
-    @BeforeEach
-    public void setup() {
-        aventurier = new Aventurier("Test", 1, 1, Orientation.N, "AADADAGGA");
-        carte = new Carte(3, 3);
-        carteService.ajouterTresor(carte, 2, 2, 1);
+    @InjectMocks
+    private AventurierService aventurierService;
+
+
+    @Test
+    void whenTournerGauche_shouldWork() {
+        Aventurier aventurier = new Aventurier("Lara", 0, 0, Orientation.N, "");
+        when(orientationService.gauche(aventurier.getOrientation())).thenReturn(Orientation.O);
+
+        aventurierService.tourner(aventurier, 'G');
+
+        assertEquals(Orientation.O, aventurier.getOrientation());
+        verify(orientationService, times(1)).gauche(Orientation.N);
     }
 
     @Test
-    void whenAvancer_shouldMoveInMap() {
-        AventurierService aventurierService = new AventurierService(orientationService);
-
-        aventurierService.avancer(aventurier, carte);
-
-        assertEquals(1, aventurier.getX());
-        assertEquals(2, aventurier.getY());
-    }
-
-    @Test
-    void whenAvancerOnTreasure_shouldPickUpTreasure() {
-        aventurier = new Aventurier("Test", 1, 1, Orientation.E, "A");
-        carteService.ajouterTresor(carte,2, 1, 1);
-        aventurierService.avancer(aventurier, carte);
-        assertEquals(2, aventurier.getX());
-        assertEquals(1, aventurier.getY());
-        assertFalse(carte.getTresors().containsKey(new Point(2, 1)));
-    }
-
-    @Test
-    void whenAvancerOnMountain_shouldNotMove() {
-        aventurier = new Aventurier("Test", 1, 1, Orientation.E, "A");
-        carteService.ajouterMontagne(carte,2, 1);
-        aventurierService.avancer(aventurier, carte);
-        assertEquals(1, aventurier.getX()); // L'aventurier ne doit pas bouger
-        assertEquals(1, aventurier.getY());
-    }
-
-    @Test
-    void whenAvancerOutOfMap_shouldNotMove() {
-        aventurier = new Aventurier("Test", 0, 0, Orientation.N, "A");
-        aventurierService.avancer(aventurier, carte);
-        assertEquals(0, aventurier.getX()); // L'aventurier ne doit pas bouger
-        assertEquals(0, aventurier.getY());
-    }
-
-    @Test
-    void whenTourner_shouldTourner() {
-        when(orientationService.droite(Orientation.N)).thenReturn(Orientation.E);
+    void whenTournerDroit_shouldWork() {
+        Aventurier aventurier = new Aventurier("Lara", 0, 0, Orientation.N, "");
+        when(orientationService.droite(aventurier.getOrientation())).thenReturn(Orientation.E);
 
         aventurierService.tourner(aventurier, 'D');
 
         assertEquals(Orientation.E, aventurier.getOrientation());
+        verify(orientationService, times(1)).droite(Orientation.N);
+    }
+
+    @Test
+    void whenAvancer_shouldAvance() {
+        Aventurier aventurier = new Aventurier("Lara", 1, 1, Orientation.N, "");
+        Carte carte = new Carte(3, 3);
+        String[][] carteArray = {
+                {".", ".", "."},
+                {".", "A", "."},
+                {".", ".", "."}
+        };
+        carte.setCarte(carteArray);
+
+        aventurierService.avancer(aventurier, carte);
+
+        assertEquals(1, aventurier.getX());
+        assertEquals(0, aventurier.getY());
+        assertEquals("A", carte.getCarte()[0][1]);
+        assertEquals(".", carte.getCarte()[1][1]);
+    }
+
+    @Test
+    void whenAvancerSurMur_shouldNotAvance() {
+        Aventurier aventurier = new Aventurier("Lara", 1, 1, Orientation.N, "");
+        Carte carte = new Carte(3, 3);
+        String[][] carteArray = {
+                {".", "M", "."},
+                {".", "A", "."},
+                {".", ".", "."}
+        };
+        carte.setCarte(carteArray);
+
+        aventurierService.avancer(aventurier, carte);
+
+        assertEquals(1, aventurier.getX());
+        assertEquals(1, aventurier.getY());
+        assertEquals("A", carte.getCarte()[1][1]);
     }
 
     @Test
     void whenExecuterSequence_shouldExecute() {
+        Aventurier aventurier = new Aventurier("Lara", 1, 1, Orientation.N, "AADG");
+        Carte carte = new Carte(3, 3);
+        String[][] carteArray = {
+                {".", ".", "."},
+                {".", "A", "."},
+                {".", ".", "."}
+        };
+        carte.setCarte(carteArray);
+
+        when(orientationService.droite(any())).thenReturn(Orientation.E);
+        when(orientationService.gauche(any())).thenReturn(Orientation.N);
+
         aventurierService.executerSequence(aventurier, carte);
-        Map<Point, Integer> tresor = carte.getTresors();
-        assertEquals(2, aventurier.getX());
+
+        assertEquals(1, aventurier.getX());
         assertEquals(0, aventurier.getY());
-        assertTrue(carte.getTresors().containsKey(new Point(2, 2)));
+        assertEquals(Orientation.N, aventurier.getOrientation());
+    }
+
+    @Test
+    void whenAjouterTresor_shouldGetTresor() {
+        Aventurier aventurier = new Aventurier("Lara", 1, 1, Orientation.N, "");
+        Carte carte = new Carte(3, 3);
+        String[][] carteArray = {
+                {".", ".", "."},
+                {".", "A", "."},
+                {".", ".", "."}
+        };
+        Map<Point, Integer> tresors = new HashMap<>();
+        tresors.put(new Point(1, 0), 2);
+        carte.setTresors(tresors);
+        carte.setCarte(carteArray);
+
+        aventurierService.avancer(aventurier, carte);
+
+        assertEquals(1, aventurier.getX());
+        assertEquals(0, aventurier.getY());
+        assertEquals(1, (int) carte.getTresors().get(new Point(1, 0)));
     }
 }

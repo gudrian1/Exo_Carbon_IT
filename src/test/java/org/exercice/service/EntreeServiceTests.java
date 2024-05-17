@@ -1,9 +1,13 @@
 package org.exercice.service;
 
+import org.exercice.entite.Aventurier;
 import org.exercice.entite.Carte;
+import org.exercice.entite.Orientation;
 import org.exercice.utils.IScanner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -13,75 +17,99 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EntreeServiceTests {
+class EntreeServiceTests {
 
     @Mock
-    private IScanner scannerMock;
+    private CarteService carteService;
+
     @Mock
+    private IScanner scanner;
+
+    @InjectMocks
     private EntreeService entreeService;
 
     @Test
-    void lireFichierEntreeTest_AvecCommentaires() {
-        // Arrange
-        when(scannerMock.hasNextLine()).thenReturn(true, true, true, true, true, false); // add one more true
-        when(scannerMock.nextLine()).thenReturn(
-                "# Ceci est un commentaire",
-                "C - 3 - 4",
-                "# Autre commentaire",
-                "M - 1 - 1"
-        );
-        String nomFichier = "test.txt";
+    void whenLireFichierEntree_shouldCreerCarte() {
+        when(scanner.hasNextLine()).thenReturn(true, false);
+        when(scanner.nextLine()).thenReturn("C - 3 - 4");
 
-        // Act
-        Optional<Carte> resultat = entreeService.lireFichierEntree(nomFichier, scannerMock);
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
 
-        // Assert
-        assertTrue(resultat.isPresent());
-        Carte carte = resultat.get();
-        assertNotNull(carte);
-        assertEquals(3, carte.getLargeur());
-        assertEquals(4, carte.getHauteur());
-        verify(scannerMock, times(6)).hasNextLine(); // change to 6 times
-        verify(scannerMock, times(5)).nextLine(); // change to 5 times
+        assertTrue(carte.isPresent());
+        assertEquals(3, carte.get().getLargeur());
+        assertEquals(4, carte.get().getHauteur());
     }
 
     @Test
-    void lireFichierEntreeTest_CarteCreee() {
-        // Arrange
-        when(scannerMock.hasNextLine()).thenReturn(true, true, true, true, false); // add one more true
-        when(scannerMock.nextLine()).thenReturn(
-                "C - 3 - 4",
-                "M - 1 - 1",
-                "T - 0 - 2 - 2"
-        );
-        String nomFichier = "test.txt";
+    void whenLireFichierEntree_shouldAjouterMontagne() {
+        when(scanner.hasNextLine()).thenReturn(true, true, false);
+        when(scanner.nextLine()).thenReturn("C - 3 - 4", "M - 1 - 2");
 
-        // Act
-        Optional<Carte> resultat = entreeService.lireFichierEntree(nomFichier, scannerMock);
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
 
-        // Assert
-        assertTrue(resultat.isPresent());
-        Carte carte = resultat.get();
-        assertNotNull(carte);
-        assertEquals(3, carte.getLargeur());
-        assertEquals(4, carte.getHauteur());
-        verify(scannerMock, times(5)).hasNextLine(); // change to 5 times
-        verify(scannerMock, times(4)).nextLine(); // change to 4 times
+        assertTrue(carte.isPresent());
+        verify(carteService, times(1)).ajouterMontagne(carte.get(), 1, 2);
     }
 
     @Test
-    void lireFichierEntreeTest_FichierInvalide() {
-        // Arrange
-        when(scannerMock.hasNextLine()).thenReturn(true, true, false); // add one more true
-        when(scannerMock.nextLine()).thenReturn("C - trois - quatre");
-        String nomFichier = "test.txt";
+    void whenLireFichierEntree_shouldAjouterTresor() {
+        when(scanner.hasNextLine()).thenReturn(true, true, false);
+        when(scanner.nextLine()).thenReturn("C - 3 - 4", "T - 1 - 2 - 3");
 
-        // Act & Assert
-        Exception exception = assertThrows(NumberFormatException.class, () -> {
-            entreeService.lireFichierEntree(nomFichier, scannerMock);
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
+
+        assertTrue(carte.isPresent());
+        verify(carteService, times(1)).ajouterTresor(carte.get(), 1, 2, 3);
+    }
+
+    @Test
+    void whenLireFichierEntree_shouldAjouterAventurier() {
+        when(scanner.hasNextLine()).thenReturn(true, true, false);
+        when(scanner.nextLine()).thenReturn("C - 3 - 4", "A - Lara - 1 - 1 - N - AADG");
+
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
+
+        assertTrue(carte.isPresent());
+        ArgumentCaptor<Aventurier> aventurierCaptor = ArgumentCaptor.forClass(Aventurier.class);
+        verify(carteService, times(1)).ajouterAventurier(eq(carte.get()), aventurierCaptor.capture());
+
+        Aventurier aventurier = aventurierCaptor.getValue();
+        assertEquals("Lara", aventurier.getNom());
+        assertEquals(1, aventurier.getX());
+        assertEquals(1, aventurier.getY());
+        assertEquals(Orientation.N, aventurier.getOrientation());
+        assertEquals("AADG", aventurier.getSequence());
+    }
+
+    @Test
+    void whenLireFichierEntree_shouldIgnorerCommentaires() {
+        when(scanner.hasNextLine()).thenReturn(true, true, false);
+        when(scanner.nextLine()).thenReturn("# Ceci est un commentaire", "C - 3 - 4");
+
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
+
+        assertTrue(carte.isPresent());
+        assertEquals(3, carte.get().getLargeur());
+        assertEquals(4, carte.get().getHauteur());
+    }
+
+    @Test
+    void whenLireFichierEntree_shouldGererException() {
+        when(scanner.hasNextLine()).thenReturn(true, true, false);
+        when(scanner.nextLine()).thenReturn("C - 3 - 4", "A - Lara - X - Y - NORTH - AADG");
+
+        assertThrows(NumberFormatException.class, () -> {
+            entreeService.lireFichierEntree("test.txt", scanner);
         });
-        assertNotNull(exception);
-        verify(scannerMock, times(3)).hasNextLine(); // change to 3 times
-        verify(scannerMock, times(2)).nextLine(); // change to 2 times
+    }
+
+    @Test
+    void whenLireFichierEntree_shouldNotCreerCarte() {
+        when(scanner.hasNextLine()).thenReturn(true, false);
+        when(scanner.nextLine()).thenReturn("A - Lara - 1 - 1 - NORTH - AADG");
+
+        Optional<Carte> carte = entreeService.lireFichierEntree("test.txt", scanner);
+
+        assertFalse(carte.isPresent());
     }
 }

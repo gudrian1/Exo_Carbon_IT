@@ -6,6 +6,7 @@ public class OrientationService {
 
     /**
      * Retourne l'orientation à gauche de l'orientation actuelle
+     *
      * @param orientation L'orientation actuelle
      * @return L'orientation à gauche
      */
@@ -15,6 +16,7 @@ public class OrientationService {
 
     /**
      * Retourne l'orientation à droite de l'orientation actuelle
+     *
      * @param orientation L'orientation actuelle
      * @return L'orientation à droite
      */

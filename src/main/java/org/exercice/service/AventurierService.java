@@ -13,6 +13,7 @@ public class AventurierService {
 
     /**
      * Constructeur
+     *
      * @param orientationService Le service d'orientation
      */
     public AventurierService(OrientationService orientationService) {
@@ -21,8 +22,9 @@ public class AventurierService {
 
     /**
      * Fait tourner l'aventurier
+     *
      * @param aventurier L'aventurier à tourner
-     * @param direction La direction dans laquelle tourner l'aventurier
+     * @param direction  La direction dans laquelle tourner l'aventurier
      */
     public void tourner(Aventurier aventurier, char direction) {
         if (direction == 'G') {
@@ -34,8 +36,9 @@ public class AventurierService {
 
     /**
      * Fait avancer l'aventurier
+     *
      * @param aventurier L'aventurier à avancer
-     * @param carte La carte sur laquelle avancer
+     * @param carte      La carte sur laquelle avancer
      */
     public void avancer(Aventurier aventurier, Carte carte) {
         int newX = aventurier.getX() + aventurier.getOrientation().dx;
@@ -57,8 +60,9 @@ public class AventurierService {
 
     /**
      * Exécute la séquence d'actions de l'aventurier
+     *
      * @param aventurier L'aventurier à exécuter la séquence
-     * @param carte La carte sur laquelle exécuter la séquence
+     * @param carte      La carte sur laquelle exécuter la séquence
      */
     public void executerSequence(Aventurier aventurier, Carte carte) {
         for (char action : aventurier.getSequence().toCharArray()) {

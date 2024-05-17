@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class OrientationServiceTests {
+class OrientationServiceTests {
 
     @Mock
     private OrientationService orientationService;
 
     @Test
-    public void whenTestGauche_shouldOrientLeft() {
+    void whenTestGauche_shouldOrientLeft() {
         when(orientationService.gauche(Orientation.N)).thenReturn(Orientation.O);
         when(orientationService.gauche(Orientation.E)).thenReturn(Orientation.N);
         when(orientationService.gauche(Orientation.S)).thenReturn(Orientation.E);
@@ -29,7 +29,7 @@ public class OrientationServiceTests {
     }
 
     @Test
-    public void whenTestDroite_shouldOrientRight() {
+    void whenTestDroite_shouldOrientRight() {
         when(orientationService.droite(Orientation.N)).thenReturn(Orientation.E);
         when(orientationService.droite(Orientation.E)).thenReturn(Orientation.S);
         when(orientationService.droite(Orientation.S)).thenReturn(Orientation.O);

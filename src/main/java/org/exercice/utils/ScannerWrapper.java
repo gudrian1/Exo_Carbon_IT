@@ -3,7 +3,7 @@ package org.exercice.utils;
 import java.util.Scanner;
 
 /**
- * Classe enveloppant un scanner
+ * Classe enveloppant un scanner pour Mocker Scanner
  */
 public class ScannerWrapper implements IScanner {
 

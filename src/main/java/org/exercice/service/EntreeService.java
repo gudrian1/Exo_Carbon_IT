@@ -6,21 +6,26 @@ import org.exercice.entite.Orientation;
 import org.exercice.utils.IScanner;
 
 import java.util.Optional;
-import java.util.Scanner;
 
 /**
  * Service de lecture d'un fichier d'entrée
  */
 public class EntreeService {
 
-    private static CarteService carteService;
+    private final CarteService carteService;
 
+    /**
+     * Constructeur
+     *
+     * @param carteService Le service de gestion de la carte
+     */
     public EntreeService(CarteService carteService) {
-        EntreeService.carteService = carteService;
+        this.carteService = carteService;
     }
 
     /**
      * Lit un fichier d'entrée et crée une carte à partir de son contenu
+     *
      * @param nomFichier Le nom du fichier à lire
      * @return La carte créée à partir du fichier
      */
@@ -28,7 +33,7 @@ public class EntreeService {
         // Déclaration de la carte
         Carte carte = null;
 
-        try  {
+        try {
             // Parcours de chaque ligne du fichier
 
             while (scanner.hasNextLine()) {
