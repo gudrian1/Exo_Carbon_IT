@@ -44,7 +44,7 @@ public class AventurierService {
         int newX = aventurier.getX() + aventurier.getOrientation().dx;
         int newY = aventurier.getY() + aventurier.getOrientation().dy;
 
-        if (estSurLaCarte(newX, newY, carte) && !estMur(newX, newY, carte)) {
+        if (estSurLaCarte(newX, newY, carte) && !estMontagne(newX, newY, carte)) {
             Point nouvellePosition = new Point(newX, newY);
 
             // Gère les trésors
@@ -79,7 +79,7 @@ public class AventurierService {
         return x >= 0 && x < carte.getLargeur() && y >= 0 && y < carte.getHauteur();
     }
 
-    private boolean estMur(int x, int y, Carte carte) {
+    private boolean estMontagne(int x, int y, Carte carte) {
         return carte.getCarte()[y][x].equals("M");
     }
 
